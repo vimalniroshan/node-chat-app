@@ -8,7 +8,7 @@ const publicPath = path.join(__dirname, '../public');
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
-const {generateMessage} = require('./utils/message.js');
+const {generateMessage, generateLocationMessage} = require('./utils/message.js');
 
 app.use(express.static(publicPath));
 
@@ -22,6 +22,10 @@ io.on('connection', (socket) => {
     console.log('Create message:', message);
     callback('Server');
     io.emit('newMessage', generateMessage(message.from, message.text));
+  });
+
+  socket.on('createLocationMessage', (coords) => {
+    io.emit('newLocation', generateLocationMessage('Admin', coords.latitude, coords.longitude));
   });
 
   socket.on('disconnect', () => {
