@@ -56,6 +56,15 @@ socket.on('newLocation', function(message) {
   scrollToBottom();
 });
 
+socket.on('updatedUserList', (userNameList) => {
+  var ol = $('<ol></ol>');
+  userNameList.forEach((userName) => {
+    ol.append($('<li></li>').text(userName));
+  });
+
+  $('#users').html(ol);
+});
+
 socket.on('disconnect', function() {
   console.log('Lost connection to server');
 });
