@@ -42,21 +42,32 @@ io.on('connection', (socket) => {
   });
 
   socket.on('createMessage', (message, callback) => {
-    console.log('Create message:', message);
+    var user = users.getUser(socket.id);
+
+    if(user && isRealString(message.text)) {
+      io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+    }
+
     callback('Server');
-    io.emit('newMessage', generateMessage(message.from, message.text));
   });
 
   socket.on('createLocationMessage', (coords) => {
-    io.emit('newLocation', generateLocationMessage('Admin', coords.latitude, coords.longitude));
+    var user = users.getUser(socket.id);
+
+    if(user) {
+      io.to(user.room)
+        .emit('newLocation', generateLocationMessage(user.name, coords.latitude, coords.longitude));
+    }
   });
 
   socket.on('disconnect', () => {
     console.log('User was disconnected');
     var removedUser = users.removeUser(socket.id);
     if(removedUser) {
-        io.to(removedUser.room).emit('updatedUserList', users.getUserList(removedUser.room));
-        io.to(removedUser.room).emit('newMessage', generateMessage('Admin', `${removedUser.name} has left.`));
+        io.to(removedUser.room)
+          .emit('updatedUserList', users.getUserList(removedUser.room));
+        io.to(removedUser.room)
+          .emit('newMessage', generateMessage('Admin', `${removedUser.name} has left.`));
     }
   });
 });

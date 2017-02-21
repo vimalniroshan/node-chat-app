@@ -80,10 +80,7 @@ $('#message-form').on('submit', function(e) {
     return;
   }
 
-  socket.emit('createMessage', {
-    from: 'User',
-    text: message
-  }, function(ack) {
+  socket.emit('createMessage', { text: message }, function(ack) {
       messageTextbox.val('');
   });
 });
